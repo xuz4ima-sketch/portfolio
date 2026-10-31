@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Al-Himma — Абу Сальма: сайты, Telegram-боты, Mini Apps и веб-сервисы</title>
   <meta name="description" content="Al-Himma — разработка сайтов, Telegram-ботов обратной связи, Telegram Mini Apps и веб-сервисов. Сайт — за 3–7 дней, бот — за 1 день.">
-  <meta name="theme-color" content="#F4F0EA">
+  <meta name="theme-color" content="#FFFFFF">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='12 -28 200 200'%3E%3Cpath fill='%23D9652A' d='M101 18h22v63l-11 21-11-21zM54 50l45 45 1 29-60.5-59.5zM170 50l-45 45-1 29 60.5-59.5zM16 105h49.5L85 125H29zM208 105h-49.5L139 125h56z'/%3E%3C/svg%3E">
 
   <!-- Анимации включаем только если пользователь не просил их уменьшить -->
@@ -30,13 +30,30 @@
   <!-- на широком экране стеклянный логотип — готовая картинка с тенями (см. .hero__logo--glass в CSS) -->
   <link rel="preload" as="image" href="assets/brand/glass-word@1x.webp" imagesrcset="assets/brand/glass-word@1x.webp 1x, assets/brand/glass-word@2x.webp 2x" media="(min-width: 1000px)">
   <link rel="preload" as="image" href="assets/brand/glass-mark@1x.webp" imagesrcset="assets/brand/glass-mark@1x.webp 1x, assets/brand/glass-mark@2x.webp 2x" media="(min-width: 1000px)">
-  <link rel="stylesheet" href="css/style.css?v=20261031c">
+  <link rel="stylesheet" href="css/style.css?v=20261101b">
 </head>
 <body>
+  <!-- ============ ЗАСТАВКА ============ -->
+  <!-- как в видеозаставке: круг «الهمة» выпрыгивает, кареткой печатается название, потом круг
+       сжимается в кольцо и становится кнопкой Play, кнопка «нажимается» — и лист уезжает.
+       Название вставляет main.js на языке сайта -->
+  <div class="splash" id="splash" aria-hidden="true">
+    <div class="splash__inner">
+      <span class="splash__ball">
+        <span class="splash__hole"></span>
+        <span class="splash__core"><span class="splash__ar"></span></span>
+        <svg class="splash__play" viewBox="0 0 100 100"><path d="M34 22 80 50 34 78Z"/></svg>
+        <span class="splash__ripple"></span>
+      </span>
+      <p class="splash__type"><span class="splash__caret"></span><span class="splash__name"></span></p>
+      <span class="splash__line"></span>
+    </div>
+  </div>
+
   <a class="skip" href="#main" data-i18n="ui.skip">К содержимому</a>
 
   <!-- ============ ШАПКА ============ -->
-  <header class="header" id="top">
+  <header class="header theme-light" id="top">
     <div class="header__bar container">
       <a class="brand" href="#hero" aria-label="Al-Himma">
         <svg class="brand__mark" aria-hidden="true"><use href="#i-mark"/></svg>
@@ -68,7 +85,7 @@
     <!-- ============ HERO ============ -->
     <!-- Первый экран в духе обложки «PORTFOLIO»: на белом глянце огромный логотип «الهمة»,
          снизу слева — имя и кнопки, справа — чем занимаюсь. -->
-    <section class="hero" id="hero" aria-labelledby="hero-title">
+    <section class="hero theme-light" id="hero" aria-labelledby="hero-title">
       <h1 class="visually-hidden" id="hero-title" data-i18n="hero.title"></h1>
       <!-- обёртка двигается при прокрутке отдельным слоем, а логотип с тенями внутри не перерисовывается -->
       <div class="hero__float" aria-hidden="true">
@@ -116,7 +133,7 @@
     </section>
 
     <!-- ============ РАБОТЫ ============ -->
-    <section class="section section--tint" id="cases" aria-labelledby="cases-title">
+    <section class="section section--tint theme-light" id="cases" aria-labelledby="cases-title">
       <div class="container">
         <header class="section__head">
           <h2 class="h2" id="cases-title" data-i18n="cases.title"></h2>
@@ -138,7 +155,7 @@
     </section>
 
     <!-- ============ ЦЕНЫ ============ -->
-    <section class="section section--tint" id="pricing" aria-labelledby="pricing-title">
+    <section class="section section--tint theme-light" id="pricing" aria-labelledby="pricing-title">
       <div class="container pricing">
         <header class="pricing__head">
           <h2 class="h2" id="pricing-title" data-i18n="pricing.title"></h2>
@@ -195,7 +212,7 @@
     </section>
 
     <!-- ============ ВОПРОСЫ ============ -->
-    <section class="section section--tint" id="faq" aria-labelledby="faq-title">
+    <section class="section section--tint theme-light" id="faq" aria-labelledby="faq-title">
       <div class="container faq__wrap">
         <header class="section__head">
           <h2 class="h2" id="faq-title" data-i18n="faq.title"></h2>
@@ -254,7 +271,7 @@
   <script src="js/vendor/SplitText.min.js"></script>
   <script src="js/vendor/ScrollTrigger.min.js"></script>
   <script src="js/vendor/lenis.min.js"></script>
-  <script src="js/content.js?v=20261031c"></script>
-  <script src="js/main.js?v=20261031e"></script>
+  <script src="js/content.js?v=20261101a"></script>
+  <script src="js/main.js?v=20261101b"></script>
 </body>
 </html>
