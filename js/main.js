@@ -406,7 +406,8 @@
       // только transform и opacity: раньше скриншот раскрывался через clip-path, и браузер
       // перерисовывал всю картинку с тенью в каждом кадре — при подходе к работам прокрутка лагала
       // карточки работ всплывают целиком; на телефоне они стоят в ленте, поэтому триггер — сама лента
-      $$(".case").forEach((card, i) => {
+      // со спиралью сетка скрыта: триггер у скрытой карточки сразу «пройден» и, удаляясь посреди пересчёта, ломал ScrollTrigger
+      if (!$("#spiral.is-on")) $$(".case").forEach((card, i) => {
         const img = card.querySelector(".case__shot img, .case__shot video");
         if (img.decode) img.decode().catch(() => {});   // декодируем заранее, а не в первом кадре появления
         gsap.set([card, img], { transition: "none", willChange: "transform" });   // CSS-переход не должен догонять GSAP
@@ -577,6 +578,7 @@
     store.set(l);
     if (!init) teardown();
     render();
+    spiralSync();
     if (init) {
       const ready = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
       Promise.race([ready, new Promise((r) => setTimeout(r, 1500))]).then(() => build(false));
@@ -585,7 +587,66 @@
     }
   }
 
-  mqReduce.addEventListener("change", () => { teardown(); smoothOff(); smoothOn(); build(true); });
+  /* ------------------------------------------------- спираль работ (js/spiral.js)
+     Создаётся один раз: картинки у языков общие, при смене языка меняется только описание.
+     Описание раскрытой работы рисуем здесь — с кнопкой «Открыть сайт» или «Смотреть видео». */
+  let spiral = null;
+  const spiralPanel = (i, el) => {
+    const T = C[lang].cases, c = T.items[i], n = T.items.length;
+    const btn = c.url
+      ? `<a class="btn case__link" href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.visit || T.visit)} ${ico("ext")}</a>`
+      : c.video ? `<button class="btn case__link" type="button" data-video="${i}">${esc(T.watch)} ${ico("play")}</button>` : "";
+    el.innerHTML = `
+      <p class="spiral__num">${String(i + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}</p>
+      <ul class="pills">${c.tags.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
+      <h3 class="spiral__title">${esc(c.title)}</h3>
+      <p class="spiral__text">${esc(c.text)}</p>
+      ${btn}`;
+  };
+  function spiralSync() {
+    const root = $("#spiral");
+    if (!root || !window.Spiral) return;
+    if (!animOn()) { if (spiral) { spiral.destroy(); spiral = null; } return; }
+    if (spiral) { spiral.refresh(); return; }
+    spiral = window.Spiral.create({
+      root,
+      items: C[lang].cases.items.map((c) => ({ img: c.img })),
+      fill: spiralPanel,
+      scrollTo: (y) => {
+        if (lenis) lenis.scrollTo(y, { duration: 0.9 });
+        else window.scrollTo({ top: y, behavior: "smooth" });
+      },
+      onPick: (i) => {
+        const c = C[lang].cases.items[i];
+        if (c.url) window.open(c.url, "_blank", "noopener");
+        else if (c.video) openVideo(c);
+      }
+    });
+    // высота обёртки сцены меняет страницу — триггеры ниже пересчитает ResizeObserver внизу файла
+  }
+  $("#spiral")?.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-video]");
+    if (b) openVideo(C[lang].cases.items[+b.dataset.video]);
+  });
+
+  // ролик работы без сайта — в окне поверх страницы
+  const vbox = $("#vbox");
+  function openVideo(c) {
+    if (!vbox || !c || !c.video) return;
+    const v = vbox.querySelector("video");
+    vbox.querySelector("[data-vbox-close]").setAttribute("aria-label", C[lang].cases.close);
+    v.setAttribute("aria-label", c.title);
+    if (v.getAttribute("src") !== c.video) { v.poster = c.img; v.src = c.video; }
+    vbox.showModal();
+    if (lenis) lenis.stop();
+    v.play().catch(() => {});
+  }
+  if (vbox) {
+    vbox.addEventListener("close", () => { vbox.querySelector("video").pause(); if (lenis) lenis.start(); });
+    vbox.addEventListener("click", (e) => { if (e.target === vbox || e.target.closest("[data-vbox-close]")) vbox.close(); });
+  }
+
+  mqReduce.addEventListener("change", () => { teardown(); smoothOff(); smoothOn(); build(true); spiralSync(); });
   window.addEventListener("resize", finishIntro, { passive: true });
 
   // Высота страницы меняется уже после сборки анимаций: раскрыли ответ в «Вопросах», догрузились отзывы.

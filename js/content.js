@@ -96,6 +96,8 @@ window.CONTENT = {
       title: "Мои проекты",
       lead: "Живые проекты — их можно открыть и посмотреть.",
       visit: "Открыть сайт",
+      watch: "Смотреть видео",
+      close: "Закрыть",
       items: [
         { img: "assets/cases/badr-market.jpg", url: "https://xuz4ima-sketch.github.io/badr-market/", title: "BadrBook — сайт издательского дома",
           text: "Книги и серии издательства, прайс в Excel для опта и розницы, раздел «Где купить».", tags: ["Сайт", "Каталог", "Прайс"] },
@@ -261,6 +263,8 @@ window.CONTENT = {
       title: "My projects",
       lead: "Live projects you can open and look at.",
       visit: "Open site",
+      watch: "Watch video",
+      close: "Close",
       items: [
         { img: "assets/cases/badr-market.jpg", url: "https://xuz4ima-sketch.github.io/badr-market/", title: "BadrBook — publishing house site",
           text: "The publisher’s books and series, an Excel price list for wholesale and retail, and a “Where to buy” section.", tags: ["Website", "Catalog", "Price list"] },

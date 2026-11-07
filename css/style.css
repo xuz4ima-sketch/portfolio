@@ -385,6 +385,56 @@ html.anim .is-in::before { animation: pill-open 1s cubic-bezier(.45, 0, .3, 1) b
 /* --- работы: белый блок, снизу из-под сетки тлеет терракотовый свет --- */
 #cases { background: radial-gradient(70% 50% at 50% 100%, rgba(217, 101, 42, .1), rgba(217, 101, 42, 0)), var(--bg-2); }
 #cases .section__head { margin-bottom: clamp(24px, 4vw, 48px); }
+/* --- спираль работ (js/spiral.js). Пока класса is-on нет (нет WebGL, «уменьшить движение»),
+   это обычный заголовок раздела над сеткой. С is-on: высокая обёртка, внутри сцена в экран высотой
+   прилипает через sticky — так прокрутка остаётся родной и на телефоне ничего не дёргается --- */
+.spiral__gl, .spiral__panel { display: none; }
+/* высота обёртки: экран + по ~0.8 экрана прокрутки на каждую работу (--spiral-len ставит spiral.js) */
+.spiral.is-on { position: relative; height: calc(var(--spiral-len, 3) * 100vh); height: calc(var(--spiral-len, 3) * 100svh); margin-top: calc(-1 * clamp(72px, 9vw, 128px)); }
+.spiral.is-on .spiral__stage {
+  position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden;
+  display: grid; place-items: center;
+}
+.spiral.is-on .spiral__headwrap { grid-area: 1 / 1; }
+.spiral.is-on .spiral__head { margin: 0; text-align: center; will-change: opacity; }
+.spiral.is-on .spiral__head .h2 { font-size: clamp(3rem, 1.6rem + 7vw, 8.5rem); line-height: .92; }
+.spiral.is-on .spiral__head .lead { margin-inline: auto; }
+.spiral.is-on .spiral__gl { display: block; position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; -webkit-tap-highlight-color: transparent; }
+/* описание раскрытой работы: место и ширину ставит spiral.js, появление — класс is-on */
+.spiral.is-on .spiral__panel {
+  display: block; position: absolute; z-index: 3; left: 0; top: 0;
+  padding: clamp(16px, 2vw, 24px); border-radius: var(--r-lg);
+  background: rgba(255, 255, 255, .9); border: 1px solid var(--line); box-shadow: var(--shadow);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  opacity: 0; transform: translateY(14px); pointer-events: none;
+  transition: opacity .3s var(--ease), transform .45s var(--ease);
+}
+.spiral.is-on .spiral__panel.is-on { opacity: 1; transform: none; pointer-events: auto; transition-delay: .05s; }
+.spiral__num { font-family: var(--mono); font-size: .78rem; color: var(--accent-ink); }
+.spiral__panel .pills { margin-top: 10px; gap: 4px; }
+.spiral__panel .pills li { padding: 3px 10px; background: transparent; border: 1px solid rgba(217, 101, 42, .5); color: var(--accent-ink); font-size: .78rem; }
+.spiral__title { margin-top: 12px; font-weight: 700; font-variation-settings: var(--sharp); letter-spacing: -.02em; line-height: 1.18; font-size: clamp(1.15rem, 1rem + .6vw, 1.45rem); }
+.spiral__text { margin-top: 8px; color: var(--muted); font-size: .95rem; line-height: 1.5; }
+.spiral__panel .case__link { margin-top: 16px; }
+@media (max-width: 899px) {
+  .spiral__text { font-size: .9rem; line-height: 1.45; }
+  .spiral__panel .case__link { margin-top: 12px; }
+}
+/* со спиралью сетка не нужна — работы показаны в ней; без спирали сетка остаётся */
+#cases:has(.spiral.is-on) { padding-bottom: 0; }
+#cases:has(.spiral.is-on) .cases-wrap { display: none; }
+
+/* ролик работы поверх страницы */
+.vbox { width: min(1100px, calc(100% - 2 * var(--gutter))); max-width: none; max-height: calc(100% - 2 * var(--gutter)); padding: 0; border: 0; border-radius: var(--r-md); background: #000; color: #fff; overflow: visible; }
+.vbox::backdrop { background: rgba(10, 10, 11, .78); }
+.vbox__video { display: block; width: 100%; max-height: calc(100vh - 2 * var(--gutter)); border-radius: inherit; background: #000; }
+.vbox__close {
+  position: absolute; z-index: 1; top: 10px; right: 10px; width: 44px; height: 44px; display: grid; place-items: center;
+  border: 0; border-radius: 999px; background: rgba(10, 10, 11, .6); color: #fff; cursor: pointer;
+}
+.vbox__close .ico { width: 22px; height: 22px; transform: rotate(45deg); }
+.vbox__close:hover { background: rgba(10, 10, 11, .85); }
+
 /* телефон: карточки идут столбиком, одна под другой */
 .cases { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
 .case {
