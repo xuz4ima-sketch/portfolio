@@ -64,12 +64,12 @@
 
   const TAU = Math.PI * 2;
   const clamp01 = (v) => Math.max(0, Math.min(1, v));
-  const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+  const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * t * (t * (t * 6 - 15) + 10); };
 
-  const PER = 0.8;        // прокрутка на одну работу, в высотах экрана
-  const HOLD = 0.3;       // доля этой прокрутки (с каждой стороны), пока работа стоит раскрытой
+  const PER = 1.0;        // прокрутка на одну работу, в высотах экрана
+  const HOLD = 0.24;      // доля этой прокрутки (с каждой стороны), пока работа стоит раскрытой
   const ENTER = 1.6;      // сколько «работ» спираль проходит, пока сцена въезжает и уезжает
-  const SNAP_IDLE = 220;  // мс без прокрутки — и сцена доезжает до ближайшей работы
+  const SNAP_IDLE = 420;  // мс без прокрутки — и сцена доезжает до ближайшей работы
 
   function create(opts) {
     const root = opts.root;
@@ -359,7 +359,7 @@
       last = now;
       if (yS === null) yS = yT;
       // своя мягкая инерция поверх прокрутки: на телефоне палец двигает страницу рывками
-      const k = 1 - Math.exp(-dt * (L.mobile ? 9 : 11));
+      const k = 1 - Math.exp(-dt * (L.mobile ? 5 : 6));
       const ny = Math.abs(yT - yS) < 0.05 ? yT : yS + (yT - yS) * k;
       if (ny !== yS) { yS = ny; dirty = true; }
       if (dirty && !gl.isContextLost()) { dirty = false; f = focusAt(yS); draw(); }

@@ -292,68 +292,6 @@
     return true;
   }
 
-  /* ------------------------------------------------------------- заставка
-     Как в видеозаставке: круг «الهمة» выпрыгивает, кареткой печатается название; надпись стирается,
-     а круг сжимается в кольцо с кнопкой Play, кнопка «нажимается» — и лист уезжает вверх,
-     открывая первый экран. Клик, клавиша, колесо или палец — пропустить. */
-  const splash = $("#splash");
-  let splashOn = !!splash && animOn();
-  const afterSplash = [];   // что ждёт открытия первого экрана: интро и сборка анимаций разделов
-  const whenRevealed = (fn) => { if (splashOn) afterSplash.push(fn); else fn(); };
-
-  function splashRun(l) {
-    if (!splashOn) { if (splash) splash.remove(); return; }
-    // по букве в span: каретка печатает и стирает ровно по буквам. Приставка тонкая, имя жирное
-    const letters = (s) => Array.from(s).map((ch) => `<span>${esc(ch)}</span>`).join("");
-    const [pre, word] = l === "en" ? ["AL-", "HIMMA"] : ["АЛЬ-", "ХИММА"];
-    const name = $(".splash__name", splash);
-    name.innerHTML = `${letters(pre)}<b>${letters(word)}</b>`;
-    const chars = $$("span", name);
-    const caret = $(".splash__caret", splash);
-
-    // пока идёт заставка, страница под ней не листается (lenis.stop прятал бы полосу прокрутки и сдвигал вёрстку)
-    const block = (e) => { skip(); if (e.cancelable) e.preventDefault(); };
-    const evts = [["wheel", block], ["touchmove", block], ["keydown", block], ["pointerdown", () => skip()]];
-    evts.forEach(([e, fn]) => window.addEventListener(e, fn, { passive: false }));
-
-    const reveal = () => {
-      splashOn = false;
-      evts.forEach(([e, fn]) => window.removeEventListener(e, fn, { passive: false }));
-      afterSplash.splice(0).forEach((fn) => fn());
-    };
-    const TYPE = 0.055, ERASE = 0.04;
-    const tl = gsap.timeline({ defaults: { ease: "power3.out" }, onComplete: () => splash.remove() })
-      .to(".splash__ball", { scale: 1, duration: 0.55, ease: "back.out(1.7)" }, 0.1)
-      .to(".splash__line", { scaleX: 1, duration: 0.6 }, 0.2)
-      .set(caret, { opacity: 1 }, 0.55);
-    chars.forEach((c, i) => tl.set(c, { visibility: "visible" }, 0.7 + i * TYPE));
-
-    // надпись стирается слева направо, каретка идёт за краем; круг тем временем становится кнопкой:
-    // ядро с логотипом сжимается — проступает кольцо, ядро исчезает, из центра вырастает Play
-    tl.addLabel("morph", "+=0.45");
-    chars.forEach((c, i) => tl
-      .set(c, { visibility: "hidden" }, `morph+=${i * ERASE}`)
-      .set(caret, { x: () => c.offsetLeft + c.offsetWidth - name.offsetLeft }, `morph+=${i * ERASE}`));
-    tl.set(caret, { opacity: 0 }, `morph+=${chars.length * ERASE}`)
-      .to(".splash__ball", { scale: 0.86, duration: 0.45, ease: "power2.inOut" }, "morph")
-      .to(".splash__core", { scale: 0.3, duration: 0.45, ease: "power2.in" }, "morph")
-      .to(".splash__core", { scale: 0, duration: 0.18, ease: "power1.in" }, "morph+=0.45")
-      .to(".splash__play", { scale: 1, duration: 0.4, ease: "back.out(2)" }, "morph+=0.55")
-      // «нажатие»: кольцо на миг светлеет и подаётся вперёд, внутри сходится тонкий круг
-      .addLabel("tap", "morph+=1.1")
-      .to(".splash__ball", { scale: 0.94, backgroundColor: "#E7814A", duration: 0.16 }, "tap")
-      .to(".splash__play", { fill: "#E7814A", duration: 0.16 }, "tap")
-      .to(".splash__ball", { scale: 0.86, backgroundColor: "#D9652A", duration: 0.3, ease: "power2.inOut" }, "tap+=0.16")
-      .to(".splash__play", { fill: "#D9652A", duration: 0.3, ease: "power2.inOut" }, "tap+=0.16")
-      .fromTo(".splash__ripple", { scale: 1.15, opacity: 0 }, { scale: 0.95, opacity: 1, duration: 0.25 }, "tap+=0.1")
-      .to(".splash__ripple", { scale: 0.85, opacity: 0, duration: 0.3, ease: "power2.in" }, "tap+=0.35")
-      .addLabel("out", "tap+=0.6")
-      .to(".splash__inner", { y: () => -0.12 * innerHeight, opacity: 0, filter: "blur(8px)", duration: 0.4, ease: "power2.in" }, "out")
-      .to(splash, { yPercent: -100, duration: 0.85, ease: "power4.inOut" }, "out+=0.2")
-      .add(reveal, "out+=0.45");   // логотип начинает подниматься, пока лист ещё уезжает
-    const skip = () => { if (tl.time() < tl.labels.out) tl.seek("out"); };
-  }
-
   /* ----------------------------------------------------- первый экран
      Логотип поднимается из-под линии, затем шапка и подписи. */
   let ctx = null;
@@ -450,8 +388,6 @@
       if (instant) heroShow();
       else {
         intro = heroIntro();
-        // под заставкой интро ждёт: логотип поднимается, когда её лист уезжает
-        if (splashOn) { intro.pause(); whenRevealed(() => { if (intro) intro.restart(true); }); }
       }
       if (window.ScrollTrigger) heroScroll();
     }, document.body);
@@ -461,7 +397,7 @@
     }
     if (!window.ScrollTrigger) return;
     if (instant) addSections(true);
-    else whenRevealed(() => { if (intro) sectionsLater(); });
+    else if (intro) sectionsLater();
   }
 
   // если анимации не собрались — показываем контент без них, а не пустую страницу
@@ -613,7 +549,7 @@
       items: C[lang].cases.items.map((c) => ({ img: c.img })),
       fill: spiralPanel,
       scrollTo: (y) => {
-        if (lenis) lenis.scrollTo(y, { duration: 0.9 });
+        if (lenis) lenis.scrollTo(y, { duration: 1.5, easing: (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2) });
         else window.scrollTo({ top: y, behavior: "smooth" });
       },
       onPick: (i) => {
@@ -670,6 +606,5 @@
   headerTheme();
   const urlLang = new URLSearchParams(location.search).get("lang");
   const startLang = C[urlLang] ? urlLang : (C[store.get()] ? store.get() : S.defaultLang);
-  splashRun(startLang);
   setLang(startLang, true);
 })();

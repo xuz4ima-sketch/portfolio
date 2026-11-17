@@ -617,48 +617,6 @@ html.anim .is-in::before { animation: pill-open 1s cubic-bezier(.45, 0, .3, 1) b
 /* ------------------------------------------------------------------ подвал */
 .footer { padding: 24px 0 28px; background: var(--bg); color: var(--muted); font-size: .9rem; border-top: 1px solid var(--line); }
 
-/* ------------------------------------------------------------- заставка
-   Как в видеозаставке: на светлом листе круг цвета логотипа с «الهمة», под ним кареткой печатается
-   название, затем круг становится кольцом с кнопкой Play (main.js).
-   Здесь — начальные состояния. Без анимаций (html без .anim) заставки нет. */
-.splash { display: none; }
-html.anim .splash {
-  position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; cursor: pointer;
-  background:
-    radial-gradient(60% 50% at 50% 45%, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%),
-    radial-gradient(140% 100% at 50% 50%, #F6F7F8 40%, #E6E9EB 80%, #D9DDE0 100%);
-  /* страховка: если скрипт не дошёл, заставка не закроет сайт навсегда */
-  animation: splash-bail .4s 8s forwards;
-}
-@keyframes splash-bail { to { opacity: 0; visibility: hidden; } }
-.splash__inner { --d: clamp(128px, 36vmin, 230px); display: flex; flex-direction: column; align-items: center; }
-/* круг — это кольцо: внешний диск, «дырка» цвета листа и сплошное ядро с логотипом поверх неё.
-   Пока ядро во весь размер, дырки не видно; ядро сжимается — проступает кольцо */
-.splash__ball {
-  position: relative; display: grid; place-items: center; width: var(--d); aspect-ratio: 1; border-radius: 50%;
-  background: #D9652A; transform: scale(0);
-  box-shadow: 0 18px 34px -16px rgba(170, 70, 20, .5);
-}
-.splash__ball > * { grid-area: 1 / 1; }
-.splash__hole { width: 72%; aspect-ratio: 1; border-radius: 50%; background: #FFFFFF; }
-.splash__core { display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 50%; background: #D9652A; }
-.splash__ar {
-  width: 70%; aspect-ratio: 900 / 357; background: #FFFFFF;
-  -webkit-mask: url("../assets/brand/himma-ar.svg") center / contain no-repeat; mask: url("../assets/brand/himma-ar.svg") center / contain no-repeat;
-}
-.splash__play { width: 64%; height: auto; fill: #D9652A; transform: scale(0); }
-/* тонкий круг «нажатия» внутри кольца */
-.splash__ripple { width: 64%; aspect-ratio: 1; border-radius: 50%; border: 2px solid #C9D0D5; opacity: 0; }
-.splash__type {
-  position: relative; margin-top: clamp(22px, 4vmin, 34px); padding-left: .55em; white-space: nowrap;
-  font-size: clamp(1.15rem, .9rem + 1.4vmin, 1.7rem); line-height: 1.2; letter-spacing: .02em; color: #34444C;
-}
-.splash__caret { position: absolute; left: 0; top: .12em; bottom: .1em; width: .2em; background: #1E272C; opacity: 0; }
-.splash__name { font-weight: 300; }
-.splash__name b { font-weight: 700; }
-.splash__name span { visibility: hidden; }
-.splash__line { display: block; width: clamp(130px, 30vmin, 190px); height: 4px; margin-top: 16px; border-radius: 50%; background: #CBD3D9; filter: blur(1.5px); transform: scaleX(0); }
-
 /* ----------------------------------------- анимации: начальные состояния */
 html.anim .header, html.anim .hero__word, html.anim .hero__mark,
 html.anim .hero__hello, html.anim .hero__role { visibility: hidden; }
